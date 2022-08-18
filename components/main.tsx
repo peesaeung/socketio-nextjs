@@ -17,11 +17,10 @@ export default function Main({children}: {children: React.ReactNode}) {
         <div>
             <header><h2>Fill-In</h2></header>
             <main>
-                {/*<Script src="https://unpkg.com/jquery/dist/jquery.js"></Script>*/}
                 {children}
-                <Script type="text/javascript">
+                {/*<Script type="text/javascript">
 
-                </Script>
+                </Script>*/}
             </main>
             <footer style={{textAlign: 'center'}}>&copy; {new Date().getFullYear()}</footer>
         </div>

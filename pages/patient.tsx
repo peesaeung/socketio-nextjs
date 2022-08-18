@@ -3,18 +3,20 @@ import {ErrorMessage, Form, Formik, Field, FieldArray} from "formik";
 import Head from "next/head";
 import Link from "next/link";
 
+socket.on('hn_response', async (msg)=> {
+
+});
 const initialValues = {
     HNRaw: [{HN: ''}]};
-const HNdataform = () => (
+const HNdataForm = () => (
     <div>
-        <Formik initialValues={initialValues}
-            onSubmit={async (values) => {
-                let HNArr = [];
-                for (const i in values.HNRaw) {
-                    HNArr.push(values.HNRaw[i].HN)
-                }
-                console.log(HNArr)
-                // await socket.emit('patient', hnArr);
+        <Formik initialValues={initialValues} onSubmit={async (values) => {
+            let HNArr = [];
+            for (const i in values.HNRaw) {
+                HNArr.push(values.HNRaw[i].HN)
+            }
+            console.log(HNArr)
+            // await socket.emit('patient', hnArr);
             }}>
             {({ values }) => (
                 <Form>
@@ -68,7 +70,7 @@ export default function patient_page() {
                 <button type="submit">Submit HN</button>
             </form>
             <h4>Multiple Textfield</h4>
-            <HNdataform/>
+            <HNdataForm/>
             <p id="hn_log"></p>
         </Main>
     );
