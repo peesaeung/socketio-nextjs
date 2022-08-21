@@ -1,18 +1,14 @@
 import Script from "next/script";
-import React from "react";
-import { io } from "socket.io-client";
+import React, {useEffect} from "react";
+import io from "socket.io-client";
 
-export const socket = io({autoConnect: true});
-socket.on('connect', async ()=> {
-    await socket.emit('event', {data: 'Transmission Test Passed'})
-})
-socket.on('disconnect', async ()=> {
-
-})
-socket.on('response', async (msg)=> {
-
-})
+export var mainlog:string
 export default function Main({children}: {children: React.ReactNode}) {
+
+    /*        socket.on('connect', async ()=> {
+                await socket.emit('event', {data: 'Transmission Test Passed'})
+            })*/
+
     return(
         <div>
             <header><h2>Fill-In</h2></header>

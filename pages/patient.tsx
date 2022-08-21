@@ -1,11 +1,38 @@
-import Main, {socket} from "../components/main";
+import Main from "../components/main";
 import {ErrorMessage, Form, Formik, Field, FieldArray} from "formik";
 import Head from "next/head";
 import Link from "next/link";
+import {useEffect, useState} from "react";
+import io from "socket.io-client";
 
-socket.on('hn_response', async (msg)=> {
+let hn_log:string
+let socketio = io();
+function useSocket() {
+    const [socket, setSocket] = useState(null);
+    useEffect(() => {
+        fetch('/api/socketio').finally(() => {
 
-});
+            socketio.on('connect', () => {
+                console.log('connect');
+                //socket.emit('hello');
+                socketio.emit('event', {data: 'Transmission Test Passed'});
+            });
+            socketio.on('disconnect', () => {
+                console.log('disconnect')
+                //mainlog += "\nDisconnected";
+            });
+            socketio.on('response', (msg) => {
+                console.log(msg);
+            });
+            setSocket(socketio);
+            function cleanup() {
+                socket.disconnect()
+            }
+            return cleanup;
+        })
+    }, [])
+    return socket;
+}
 const initialValues = {
     HNRaw: [{HN: ''}]};
 const HNdataForm = () => (
@@ -15,13 +42,13 @@ const HNdataForm = () => (
             for (const i in values.HNRaw) {
                 HNArr.push(values.HNRaw[i].HN)
             }
-            console.log(HNArr)
-            // await socket.emit('patient', hnArr);
+            //console.log(HNArr)
+            await socketio.emit('patient', HNArr);
             }}>
             {({ values }) => (
                 <Form>
                     <FieldArray name="HNRaw">
-                        {({ insert, remove, push }) => (
+                        {({ remove, push }) => (
                             <div>
                                 {values.HNRaw.length > 0 && values.HNRaw.map((HN, index) => (
                                     <div className="hn" key={index}>
@@ -34,7 +61,9 @@ const HNdataForm = () => (
                                         </button>
                                     </div>
                                     ))}
-                                <button type="button" className="add_hn" onClick={() => push({ HN: ''})}>
+                                <button type="button" className="add_hn" onClick={() => {
+                                    if (values.HNRaw.length < 10){push({ HN: ''})}
+                                }}>
                                     Add more HN
                                 </button>
                             </div>
@@ -47,11 +76,20 @@ const HNdataForm = () => (
     </div>
 );
 export default function patient_page() {
+    const socket = useSocket(); // Instance
+    useEffect(() => {
+        if (socket) {
+            socket.on('hn_response', (msg)=> {
+                console.log(msg.data)
+                hn_log = msg.data;
+            });
+        }
+    }, [socket]);
     const hntext_submit = async (event: any)=> {
         event.preventDefault();
         let hnArr = event.target.hnbox.value.split(' ', 10);
-        console.log(hnArr);
-        // await socket.emit('patient', hnArr);
+        //console.log(hnArr);
+        await socketio.emit('patient', hnArr);
     }
     return (
         <Main>
@@ -71,7 +109,7 @@ export default function patient_page() {
             </form>
             <h4>Multiple Textfield</h4>
             <HNdataForm/>
-            <p id="hn_log"></p>
+            <p>{hn_log}</p>
         </Main>
     );
 }

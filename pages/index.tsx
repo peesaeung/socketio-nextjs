@@ -1,10 +1,16 @@
 import Main from "../components/main";
 import Head from "next/head";
 import Link from "next/link";
-import Script from "next/script";
 
+let mainlog:string
 
 export default function Index() {
+/*    socket.on('disconnect', ()=> {
+        mainlog += "\nDisconnected";
+    })
+    socket.on('response', async (msg)=> {
+        mainlog += ('\n' + msg.data);
+    })*/
     return(
         <Main>
             <Head>
@@ -12,7 +18,7 @@ export default function Index() {
             </Head>
             <Link href="/patient"><a>Patient Data</a></Link>&nbsp;
             <Link href="/visit"><a>Visit Data</a></Link><br/>
-            <div><p id="log"></p></div>
+            <p>{mainlog}</p>
         </Main>
     );
 }
