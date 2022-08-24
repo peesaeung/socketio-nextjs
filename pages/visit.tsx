@@ -1,12 +1,11 @@
 import Main from "../components/main";
-import {ErrorMessage, Form, Formik, Field, FieldArray} from "formik";
+import { ErrorMessage, Form, Formik, Field, FieldArray } from "formik";
 import Head from "next/head";
 import Link from "next/link";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import io from "socket.io-client";
 
 let socketio = io();
-let txn_log:string
 function useSocket() {
     const [socket, setSocket] = useState(null);
     useEffect(() => {
@@ -103,6 +102,7 @@ const VisitForm = () => (
     </div>
 );
 export default function visit_page() {
+    let [txn_log, set_txn_log] = useState('')
     const socket = useSocket(); //Instance
     useEffect(() => {
         if (socket) {
@@ -115,7 +115,7 @@ export default function visit_page() {
             });*/
             socket.on('txn_response', (msg)=> {
                 console.log(msg.data)
-                txn_log = msg.data;
+                //set_txn_log(txn_log = msg.data);
             });
         }
     }, [socket]);

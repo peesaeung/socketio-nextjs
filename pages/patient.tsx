@@ -1,11 +1,10 @@
 import Main from "../components/main";
-import {ErrorMessage, Form, Formik, Field, FieldArray} from "formik";
+import { ErrorMessage, Form, Formik, Field, FieldArray } from "formik";
 import Head from "next/head";
 import Link from "next/link";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import io from "socket.io-client";
 
-let hn_log:string
 let socketio = io();
 function useSocket() {
     const [socket, setSocket] = useState(null);
@@ -76,12 +75,13 @@ const HNdataForm = () => (
     </div>
 );
 export default function patient_page() {
+    let [hn_log, set_hn_log] = useState('')
     const socket = useSocket(); // Instance
     useEffect(() => {
         if (socket) {
             socket.on('hn_response', (msg)=> {
                 console.log(msg.data)
-                hn_log = msg.data;
+                //set_hn_log(hn_log = msg.data);
             });
         }
     }, [socket]);
