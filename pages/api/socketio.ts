@@ -1,14 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { Server } from 'socket.io'
-import { Client, Pool } from "pg";
-import { host, user, password, database} from "./pgpool";
-
-const pool = new Pool({
-    host: host,
-    user: user,
-    password: password,
-    database: database
-});
+import { PrismaClient } from "@prisma/client/"
+const prisma = new PrismaClient();
 
 const ioHandler = (req:NextApiRequest, res:NextApiResponse) => {
     if (!res.socket.server.io) {
@@ -28,48 +21,29 @@ const ioHandler = (req:NextApiRequest, res:NextApiResponse) => {
             socket.on('patient',async (hn)=>{
                 console.log(hn);
                 // Querying from Hospital db by HN
+                /*
+                for (let i in hn){
+                    await prisma.xxx.findUnique({where: x: i});
+                }
+                 */
                 // queried data should be looked like this
                 const HNtest = [
-                    {"HN": "01234", "birthDate": "1987-06-05", "gender": true},
-                    {"HN": "56789", "birthDate": "2000-12-31", "gender": false},
+                    {"org_id": 1, "hn": "01234", "birth_date": new Date("1987-06-05"), "gender": true},
+                    {"org_id": 1, "hn": "56789", "birth_date": new Date("2000-12-31"), "gender": false},
                 ];
-                //console.log(HNtest);
-                /*for (let i in HNtest){
-                    /!*
-                    SQL
-                        INSERT INTO patient_info (hn, birth_date, gender)
-                        VALUES (HN.HN, HN.birthDate, HN.gender)
-                    *!/
-                    let sql = "INSERT INTO patient_info (hn, birth_date, gender) VALUES ("
-                        + HNtest[i].HN + ", " + HNtest[i].birthDate + ", " + HNtest[i].gender + ")"
-                    console.log(sql);
-                }*/
                 // Patient data (HN) >> Upsert HN >> PID
                 // Upsert to patient_info db
-                await socket.emit('hn_response', {'data':hn});
-                await pool.connect((err, client, done) => {
-                    if (err) throw err;
-                    for (let i in HNtest){
-                        /*
-                        SQL
-                            INSERT INTO patient_info (hn, birth_date, gender)
-                            VALUES (HN.HN, HN.birthDate, HN.gender)
-                        */
-                        let sql = "INSERT INTO patient_info (hn, birth_date, gender) VALUES ("
-                            + HNtest[i].HN + ", " + HNtest[i].birthDate + ", " + HNtest[i].gender + ")"
-                        console.log(sql);
-                    }
-                    /*
-                        client.query(sql, (err, res) => {
-                            done();
-                            if (err) {
-                                console.log(err.stack);
-                            } else {
-                                console.log(res.rows);
-                            }
-                        });
-                    }*/
-                });
+                for (let i in HNtest){
+                    await prisma.patient_info.upsert({
+                        create: HNtest[i],
+                        update: HNtest[i],
+                        where: {org_id_hn: {org_id: HNtest[i]['org_id'], hn: HNtest[i]['hn']}}
+                    });
+                    await socket.emit('hn_response', {'data':HNtest[i]});
+                }
+
+
+
                 // await socket.emit('patient', data, register=true)
             });
             // Patient Secret
@@ -105,51 +79,81 @@ const ioHandler = (req:NextApiRequest, res:NextApiResponse) => {
                 // await socket.emit('patientSecret', data)
             });
             // Visit Data
-            /* req should be looked like this
-            [
-                {"HN":"55/5555", "TXN": "A90909", "IPD": false},
-                {"HN":"315646", "TXN": "566410909", "IPD": true}
-            ]
-            */
-            socket.on('visit',async (req)=>{
-                // Visit data (HN, TXN) >> Transform >> PID, TXN >> Upsert TXN >> PID, VID
-                console.log(req);
-                // Querying from ...
-                /* queried data should be looked like this
-                [
-                    {
-                        "HN":"00000",
-                        "TXN": "123456789",
-                        "IPD": 0,
-                        "visitTime": "2022-02-02T20:22:02Z",
-                        "dischargeTime": "2022-02-02T22:22:22Z",
-                        "dischargeStatus": 2,
-                        "dischargeType": 1
-                    },
-                    {
-                        "HN":"00001",
-                        "TXN": "2345678",
-                        "IPD": 0,
-                        "visitTime": "2022-02-02T22:22:22Z",
-                        "dischargeTime": "2022-02-22T02:20:00Z",
-                        "dischargeStatus": 3,
-                        "dischargeType": 5
-                    },
-                    {
-                        "HN":"00001",
-                        "TXN": "A987654VIP",
-                        "IPD": 1,
-                        "visitTime": "2022-02-02T02:20:00Z",
-                        "dischargeTime": "2022-02-22T22:22:22Z",
-                        "relatedTXN": ["2345678"],
-                        "dischargeStatus": 2,
-                        "dischargeType": 1,
-                        "lengthOfStay": 23
-                    }
+            socket.on('visit',async (txn)=>{
+                // req should be looked like this
+                /*const TXNForm = [
+                    {"org_id: 1, "HN":"55/5555", "txn": "A90909", "type": false},
+                    {"org_id: 1, "HN":"315646", "txn": "566410909", "type": true}
                 ]*/
+                // Visit data (HN, TXN) >> Transform >> PID
+                /*
+                for (let i in txn){
+                    let buff = await prisma.patient_info.findUnique({
+                    where: {org_id_hn: {org_id: TXNForm[i]['org_id'], hn: TXNForm[i]['HN']}}
+                    });
+                    txn[i].pid = buff.pid;
+                    delete txn[i].HN;
+                }
+                */
+                console.log(txn);
+                /*
+                for (let i in txn){
+                    await prisma.xxx.findUnique({where: allUnique: {HN: , TXN: , IPD: }});
+                }
+                 */
+                // TXN >> Upsert TXN >> PID, VID
+                // queried data should be looked like this
+                const TXNtest = [
+                    {
+                        "org_id": 1,
+                        "pid": 1,
+                        //"HN":"00000",
+                        "txn": "123456789",
+                        "type": false,
+                        "visit_time": new Date("2022-02-02T20:22:02Z"),
+                        "discharge_time": new Date("2022-02-02T22:22:22Z"),
+                        //"dischargeStatus": 2,
+                        //"dischargeType": 1
+                    },
+                    {
+                        "org_id": 1,
+                        "pid": 2,
+                        //"HN":"00001",
+                        "txn": "2345678",
+                        "type": false,
+                        "visit_time": new Date("2022-02-02T22:22:22Z"),
+                        "discharge_time": new Date("2022-02-22T02:20:00Z"),
+                        //"dischargeStatus": 3,
+                        //"dischargeType": 5
+                    },
+                    {
+                        "org_id": 1,
+                        "pid": 2,
+                        //"HN":"00001",
+                        "txn": "A987654VIP",
+                        "type": true,
+                        "visit_time": new Date("2022-02-02T02:20:00Z"),
+                        "discharge_time": new Date("2022-02-22T22:22:22Z"),
+                        "related_txn": ["2345678"],
+                        //"dischargeStatus": 2,
+                        //"dischargeType": 1,
+                        "los": 23   // Length of Stay
+                    }
+                ]
                 // Transform >> PID, TXN >> Upsert TXN >> PID, VID
-                await socket.emit('txn_response', {'data':req})
                 // Upsert to txn_info db
+                for (let i in TXNtest){
+                    await prisma.txn_info.upsert({
+                        create: TXNtest[i],
+                        update: TXNtest[i],
+                        where: {org_id_pid_txn: {
+                            org_id: TXNtest[i]['org_id'], pid: TXNtest[i]['pid'], txn: TXNtest[i]['txn']}
+                        }
+                    });
+                    await socket.emit('txn_response', {'data':TXNtest[i]});
+                }
+                // await socket.emit('txn_response', {'data':txn})
+
                 // await socket.emit('thVisit', data, register=true)
             });
         })

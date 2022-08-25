@@ -50,13 +50,13 @@ function useSocket() {
     socketio.emit()
 }*/
 const initialValues = {
-    TXNForm: [{HN: '', TXN: '', IPD: true}]};
+    TXNForm: [{org_id: 1, HN: '', txn: '', type: true}]};
 const VisitForm = () => (
     <div>
         <Formik initialValues={initialValues} onSubmit={async (values) => {
             for (const i in values.TXNForm){
-                let isTrue = (values.TXNForm[i].IPD === "true" || values.TXNForm[i].IPD === true);
-                values.TXNForm[i].IPD = isTrue;
+                let isTrue = (values.TXNForm[i].type === "true" || values.TXNForm[i].type === true);
+                values.TXNForm[i].type = isTrue;
             }
             //console.log(values);
 
@@ -73,12 +73,12 @@ const VisitForm = () => (
                                         <Field name={`TXNForm.${index}.HN`} placeholder="HN"/>
                                         <ErrorMessage name={`TXNForm.${index}.HN`} component="div"
                                                       className="field-error"/>
-                                        <label htmlFor={`TXNForm.${index}.TXN`}>TXN:</label>
-                                        <Field name={`TXNForm.${index}.TXN`} placeholder="TXN"/>
-                                        <ErrorMessage name={`TXNForm.${index}.TXN`} component="div"
+                                        <label htmlFor={`TXNForm.${index}.txn`}>TXN:</label>
+                                        <Field name={`TXNForm.${index}.txn`} placeholder="TXN"/>
+                                        <ErrorMessage name={`TXNForm.${index}.txn`} component="div"
                                                       className="field-error"/>
-                                        <label htmlFor={`TXNForm.${index}.IPD`}>Type:</label>
-                                        <Field name={`TXNForm.${index}.IPD`} as="select">
+                                        <label htmlFor={`TXNForm.${index}.type`}>Type:</label>
+                                        <Field name={`TXNForm.${index}.type`} as="select">
                                             <option value="true">IPD</option>
                                             <option value="false">OPD</option>
                                         </Field>
@@ -88,7 +88,7 @@ const VisitForm = () => (
                                     </div>
                                 ))}
                                 <button type="button" className="add_txn" onClick={() => {
-                                    if(values.TXNForm.length < 10){push({HN: '', TXN: '', IPD: true})}
+                                    if(values.TXNForm.length < 10){push({org_id: 1 , HN: '', txn: '', type: true})}
                                 }}>
                                     Add more HN
                                 </button>
