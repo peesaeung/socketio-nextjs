@@ -1,39 +1,11 @@
 import Main from "../components/main";
+import { socketio, useSocket } from "../components/useSocket";
 import { ErrorMessage, Form, Formik, Field, FieldArray } from "formik";
 import Head from "next/head";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import io from "socket.io-client";
 
-let socketio = io();
-function useSocket() {
-    const [socket, setSocket] = useState(null);
-    useEffect(() => {
-        fetch('/api/socketio').finally(() => {
-
-            socketio.on('connect', () => {
-                console.log('connect');
-                //socket.emit('hello');
-                socketio.emit('event', {data: 'Transmission Test Passed'});
-            });
-            socketio.on('disconnect', () => {
-                console.log('disconnect')
-                //mainlog += "\nDisconnected";
-            });
-            socketio.on('response', (msg) => {
-                console.log(msg);
-            });
-            setSocket(socketio);
-            function cleanup() {
-                socket.disconnect()
-            }
-            return cleanup;
-        })
-    }, [])
-    return socket;
-}
-const initialValues = {
-    HNRaw: [{HN: ''}]};
+const initialValues = {HNRaw: [{HN: ''}]};
 const HNdataForm = () => (
     <div>
         <Formik initialValues={initialValues} onSubmit={async (values) => {
@@ -43,7 +15,7 @@ const HNdataForm = () => (
             }
             //console.log(HNArr)
             await socketio.emit('patient', HNArr);
-            }}>
+        }}>
             {({ values }) => (
                 <Form>
                     <FieldArray name="HNRaw">

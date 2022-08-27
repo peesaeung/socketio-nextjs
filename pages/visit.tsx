@@ -1,65 +1,20 @@
 import Main from "../components/main";
-import { ErrorMessage, Form, Formik, Field, FieldArray } from "formik";
+import {socketio, useSocket} from "../components/useSocket";
+import {ErrorMessage, Field, FieldArray, Form, Formik} from "formik";
 import Head from "next/head";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import io from "socket.io-client";
+import {useEffect, useState} from "react";
 
-let socketio = io();
-function useSocket() {
-    const [socket, setSocket] = useState(null);
-    useEffect(() => {
-        fetch('/api/socketio').finally(() => {
-            //socketio = io()
-
-            socketio.on('connect', () => {
-                console.log('connect');
-                //socket.emit('hello');
-                socketio.emit('event', {data: 'Transmission Test Passed'});
-            });
-            socketio.on('disconnect', () => {
-                console.log('disconnect')
-                //mainlog += "\nDisconnected";
-            });
-            socketio.on('response', (msg) => {
-                console.log(msg);
-            });
-
-            setSocket(socketio);
-            function cleanup() {
-                socket.disconnect()
-            }
-            return cleanup;
-            /*socket.on('response', (msg) => {
-                //mainlog += ('\n' + msg.data);
-            });*/
-
-            /*socket.on('hello', data => {
-                console.log('hello', data)
-            });*/
-
-            /*socket.on('a user connected', () => {
-                console.log('a user connected')
-            });*/
-
-        })
-    }, [])
-    return socket;
-}
-/*const txn_submit = (txn)=>{
-    socketio.emit()
-}*/
-const initialValues = {
-    TXNForm: [{org_id: 1, HN: '', txn: '', type: true}]};
+const initialValues = {TXNForm: [{org_id: 1, HN: '', txn: '', type: true}]};
 const VisitForm = () => (
     <div>
         <Formik initialValues={initialValues} onSubmit={async (values) => {
             for (const i in values.TXNForm){
-                let isTrue = (values.TXNForm[i].type === "true" || values.TXNForm[i].type === true);
-                values.TXNForm[i].type = isTrue;
+                //let isTrue = (values.TXNForm[i].type === "true" || values.TXNForm[i].type === true);
+                //values.TXNForm[i].type = isTrue;
+                values.TXNForm[i].type = values.TXNForm[i].type === "true" || values.TXNForm[i].type === true;
             }
             //console.log(values);
-
             await socketio.emit('visit', values);
         }}>
             {({ values }) => (

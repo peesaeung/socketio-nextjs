@@ -1,8 +1,8 @@
+import { PrismaClient } from "@prisma/client/"
 import { NextApiRequest, NextApiResponse } from "next";
 import { Server } from 'socket.io'
-import { PrismaClient } from "@prisma/client/"
-const prisma = new PrismaClient();
 
+const prisma = new PrismaClient();
 const ioHandler = (req:NextApiRequest, res:NextApiResponse) => {
     if (!res.socket.server.io) {
         console.log('*First use, starting socket.io')
@@ -152,8 +152,6 @@ const ioHandler = (req:NextApiRequest, res:NextApiResponse) => {
                     });
                     await socket.emit('txn_response', {'data':TXNtest[i]});
                 }
-                // await socket.emit('txn_response', {'data':txn})
-
                 // await socket.emit('thVisit', data, register=true)
             });
         })
