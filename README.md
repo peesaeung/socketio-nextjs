@@ -1,3 +1,5 @@
+[![CodeQL](https://github.com/peesaeung/socketio-nextjs/actions/workflows/codeql-analysis.yml/badge.svg?branch=main)](https://github.com/peesaeung/socketio-nextjs/actions/workflows/codeql-analysis.yml)
+
 This is a demonstration of SocketIO using Next.js.
 
 ## Getting Started
