@@ -149,7 +149,9 @@ const ioHandler = (req: NextApiRequest, res: NextApiResponse) => {
                         update: TXNtest[i],
                         where: {
                             org_id_pid_txn: {
-                                org_id: TXNtest[i]['org_id'], pid: TXNtest[i]['pid'], txn: TXNtest[i]['txn']
+                                org_id: TXNtest[i]['org_id'],
+                                pid: TXNtest[i]['pid'],
+                                txn: TXNtest[i]['txn']
                             }
                         }
                     });
