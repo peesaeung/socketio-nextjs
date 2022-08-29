@@ -1,20 +1,29 @@
 import Main from "../components/main";
-import { socketio, useSocket } from "../components/useSocket";
-import { ErrorMessage, Form, Formik, Field, FieldArray } from "formik";
+import {socketio, useSocket} from "../components/useSocket";
+import {ErrorMessage, Form, Formik, Field, FieldArray} from "formik";
 import Head from "next/head";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
-const initialValues = {secret:[{HN: '', txn: '', title: '', firstname: '', middlename: '', lastname: ''}]};
+const initialValues = {
+    secret: [{
+        HN: '',
+        txn: '',
+        title: '',
+        firstname: '',
+        middlename: '',
+        lastname: ''
+    }]
+};
 const SecretForm = () => (
     <div>
         <Formik initialValues={initialValues} onSubmit={async (values) => {
             await socketio.emit('patientSecret', values);
         }}>
-            {({ values }) => (
+            {({values}) => (
                 <Form>
                     <FieldArray name="secret">
-                        {({ remove, push }) => (
+                        {({remove, push}) => (
                             <div>
                                 {values.secret.length > 0 && values.secret.map((x, index) => (
                                     <div className="secret" key={index}>
@@ -50,13 +59,21 @@ const SecretForm = () => (
                                             <button type="button" className="remove_secret" onClick={() =>
                                                 remove(index)}>Remove
                                             </button>
-                                        </div><br/>
+                                        </div>
+                                        <br/>
                                     </div>
                                 ))}
                                 <button type="button" className="add_secret" onClick={() => {
-                                    push(
-                                        {HN: '', txn: '', title: '', firstname: '', middlename: '', lastname: ''}
-                                    )}}>Add more</button>
+                                    push({
+                                        HN: '',
+                                        txn: '',
+                                        title: '',
+                                        firstname: '',
+                                        middlename: '',
+                                        lastname: ''
+                                    })
+                                }}>Add more
+                                </button>
                             </div>
                         )}
                     </FieldArray>
@@ -71,7 +88,7 @@ export default function secret_page() {
     const socket = useSocket(); //Instance
     useEffect(() => {
         if (socket) {
-            socket.on('secret_response', (msg)=> {
+            socket.on('secret_response', (msg) => {
                 console.log(msg.data)
                 //set_txn_log(txn_log = msg.data);
             });

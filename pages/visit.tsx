@@ -5,7 +5,14 @@ import Head from "next/head";
 import Link from "next/link";
 import {useEffect, useState} from "react";
 
-const initialValues = {TXNForm: [{org_id: 1, HN: '', txn: '', type: true}]};
+const initialValues = {
+    TXNForm: [{
+        org_id: 1,
+        HN: '',
+        txn: '',
+        type: true
+    }]
+};
 const VisitForm = () => (
     <div>
         <Formik initialValues={initialValues} onSubmit={async (values) => {
@@ -43,10 +50,15 @@ const VisitForm = () => (
                                     </div>
                                 ))}
                                 <button type="button" className="add_txn" onClick={() => {
-                                    if(values.TXNForm.length < 10){push({org_id: 1 , HN: '', txn: '', type: true})}
-                                }}>
-                                    Add more HN
-                                </button>
+                                    if(values.TXNForm.length < 10){
+                                        push({
+                                            org_id: 1,
+                                            HN: '',
+                                            txn: '',
+                                            type: true
+                                        })
+                                    }
+                                }}>Add more HN</button>
                             </div>
                         )}
                     </FieldArray>
@@ -61,17 +73,7 @@ export default function visit_page() {
     const socket = useSocket(); //Instance
     useEffect(() => {
         if (socket) {
-            /*socket.on('hello', (data) => {
-                console.log('hello', data);
-                //setMessage(data);
-            });*/
-            /*socket.on('a user connected', () => {
-                //setUser('a user connected');
-            });*/
-            socket.on('txn_response', (msg)=> {
-                console.log(msg.data)
-                //set_txn_log(txn_log = msg.data);
-            });
+            socket.on('txn_response', (msg)=> {console.log(msg.data)});
         }
     }, [socket]);
     return (

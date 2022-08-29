@@ -1,6 +1,8 @@
 import {useEffect, useState} from "react";
 import io from "socket.io-client";
+
 export let socketio = io();
+
 export function useSocket() {
     const [socket, setSocket] = useState(null);
     useEffect(() => {
@@ -16,9 +18,11 @@ export function useSocket() {
                 console.log(msg);
             });
             setSocket(socketio);
+
             function cleanup() {
                 socket.disconnect()
             }
+
             return cleanup;
         })
     }, [])

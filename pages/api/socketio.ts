@@ -1,24 +1,23 @@
-import { PrismaClient } from "@prisma/client/"
-import { NextApiRequest, NextApiResponse } from "next";
-import { Server } from 'socket.io'
+import {PrismaClient} from "@prisma/client/"
+import {NextApiRequest, NextApiResponse} from "next";
+import {Server} from 'socket.io'
 
 const prisma = new PrismaClient();
-const ioHandler = (req:NextApiRequest, res:NextApiResponse) => {
+const ioHandler = (req: NextApiRequest, res: NextApiResponse) => {
     if (!res.socket.server.io) {
         console.log('*First use, starting socket.io')
-
         const io = new Server(res.socket.server)
 
         io.on('connection', socket => {
             // All Server Instance Here
             console.log('Connected socket.io')
             // Echo
-            socket.on('event', async (msg)=> {
-                socket.emit('response',{'data': msg.data})
+            socket.on('event', async (msg) => {
+                socket.emit('response', {'data': msg.data})
             });
             // Patient Data
             // HN = Normal Array
-            socket.on('patient',async (hn)=>{
+            socket.on('patient', async (hn) => {
                 console.log(hn);
                 // Querying from Hospital db by HN
                 /*
@@ -33,17 +32,19 @@ const ioHandler = (req:NextApiRequest, res:NextApiResponse) => {
                 ];
                 // Patient data (HN) >> Upsert HN >> PID
                 // Upsert to patient_info db
-                for (let i in HNtest){
+                for (let i in HNtest) {
                     await prisma.patient_info.upsert({
                         create: HNtest[i],
                         update: HNtest[i],
-                        where: {org_id_hn: {org_id: HNtest[i]['org_id'], hn: HNtest[i]['hn']}}
+                        where: {
+                            org_id_hn: {
+                                org_id: HNtest[i]['org_id'],
+                                hn: HNtest[i]['hn']
+                            }
+                        }
                     });
-                    await socket.emit('hn_response', {'data':HNtest[i]});
+                    await socket.emit('hn_response', {'data': HNtest[i]});
                 }
-
-
-
                 // await socket.emit('patient', data, register=true)
             });
             // Patient Secret
@@ -53,7 +54,7 @@ const ioHandler = (req:NextApiRequest, res:NextApiResponse) => {
                 {"HN":"e5555", "TXN": "0909", "reason":"coder work desk", "staff":"employee@organization.com"}
             ]
             */
-            socket.on('patientSecret', async (req)=>{
+            socket.on('patientSecret', async (req) => {
                 //Query data from ...
                 /* queried data should be looked like this
                 [
@@ -79,7 +80,7 @@ const ioHandler = (req:NextApiRequest, res:NextApiResponse) => {
                 // await socket.emit('patientSecret', data)
             });
             // Visit Data
-            socket.on('visit',async (txn)=>{
+            socket.on('visit', async (txn) => {
                 // req should be looked like this
                 /*const TXNForm = [
                     {"org_id: 1, "HN":"55/5555", "txn": "A90909", "type": false},
@@ -142,15 +143,17 @@ const ioHandler = (req:NextApiRequest, res:NextApiResponse) => {
                 ]
                 // Transform >> PID, TXN >> Upsert TXN >> PID, VID
                 // Upsert to txn_info db
-                for (let i in TXNtest){
+                for (let i in TXNtest) {
                     await prisma.txn_info.upsert({
                         create: TXNtest[i],
                         update: TXNtest[i],
-                        where: {org_id_pid_txn: {
-                            org_id: TXNtest[i]['org_id'], pid: TXNtest[i]['pid'], txn: TXNtest[i]['txn']}
+                        where: {
+                            org_id_pid_txn: {
+                                org_id: TXNtest[i]['org_id'], pid: TXNtest[i]['pid'], txn: TXNtest[i]['txn']
+                            }
                         }
                     });
-                    await socket.emit('txn_response', {'data':TXNtest[i]});
+                    await socket.emit('txn_response', {'data': TXNtest[i]});
                 }
                 // await socket.emit('thVisit', data, register=true)
             });
