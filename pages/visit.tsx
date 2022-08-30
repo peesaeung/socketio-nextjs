@@ -58,7 +58,9 @@ const VisitForm = () => (
                                             type: true
                                         })
                                     }
-                                }}>Add more HN</button>
+                                }}>
+                                    Add more HN
+                                </button>
                             </div>
                         )}
                     </FieldArray>

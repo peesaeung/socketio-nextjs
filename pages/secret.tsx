@@ -57,7 +57,9 @@ const SecretForm = () => (
                                                               className="field-error"/>
                                             </div>
                                             <button type="button" className="remove_secret" onClick={() =>
-                                                remove(index)}>Remove
+                                                remove(index)
+                                            }>
+                                                Remove
                                             </button>
                                         </div>
                                         <br/>
@@ -72,7 +74,8 @@ const SecretForm = () => (
                                         middlename: '',
                                         lastname: ''
                                     })
-                                }}>Add more
+                                }}>
+                                    Add more
                                 </button>
                             </div>
                         )}
